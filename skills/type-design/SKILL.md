@@ -42,25 +42,44 @@ Before the call graph, do one disambiguation pass. List every rule you know abou
 
 A known fact with no home — neither encoded nor contracted — is an unresolved ambiguity. Surface it and resolve it before finalizing. Prose lets ambiguity hide; types force it into the open.
 
-Output the pass as a visible ledger, not just a mental check:
+Output the pass as a visible ledger, not just a mental check. Make it a single fenced code block: the **decision is code**, the **rule is a trailing comment**. Unresolved facts are comment-questions.
 
-- **Resolved** — each rule -> the type decision it forced, traceable to its source:
-  `"only pending can be accepted" -> acceptInvite(invite: PendingInvite)`.
-  Every type choice points back to a sentence.
-- **Unresolved** — facts with no home yet, as open questions:
-  `is an expired invite still "pending"?`, `what errors can acceptInvite return?`.
-  These block finalizing; resolve or grill each before the call graph.
+- **Resolved** — each line is the actual type/signature the rule forced, with the source rule as a trailing comment. Every type choice points back to a sentence.
+- **Unresolved** — facts with no home yet, written as comment-questions. These block finalizing; resolve or grill each before the call graph.
+
+```ts
+// RESOLVED
+acceptInvite(invite: PendingInvite): Result   // "only pending can be accepted"
+type Invite = Pending | Accepted | Expired     // "distinct states are distinct types"
+
+// UNRESOLVED
+// is an expired invite still "pending"?
+// what errors can acceptInvite return?
+```
 
 ## Then the call graph
 
 Types give the shape and the seams. They do not give the flow. After the types converge, sketch the call graph — the second artifact, and the one you hand to the implementer.
 
-Produce two graphs from the same tree:
+Draw it as a **single ASCII diagram**. Prod and test paths split only above the seam — marked by a horizontal `===== SEAM` line — and merge into one shared core below it. The split-then-merge is the visual centerpiece: it shows prod and test diverging only at the adapter boundary.
 
-- **Production**: handlers -> service -> real adapters -> store/IO.
-- **Test**: the same core, fakes/memory adapters swapped in at the seam.
+- **Production** path: handlers -> service -> real adapters.
+- **Test** path: the same handler/service core, fakes/memory adapters swapped in.
+- **Shared core** below the seam: store/IO, reached identically by both.
 
-The graphs MUST converge below the seam. If prod and test paths diverge deeper than the adapter boundary, the seam is in the wrong place — the core can't be tested without reaching past it. That divergence point is the proof your seams are real.
+```
+  handler              test
+     |                   |
+  service            service        (same core)
+     |                   |
+  realAdapter        fakeAdapter
+     \                 /
+  ===================== SEAM
+          store/IO
+        (shared core)
+```
+
+The paths MUST converge below the seam. If prod and test diverge deeper than the adapter boundary, the seam is in the wrong place — the core can't be tested without reaching past it. That divergence point is the proof your seams are real.
 
 Annotate non-obvious ordering and compensation inline, e.g. `createAlias -> store.insert -> index.put -> on index failure: store.delete`. Ordering and rollback are flow facts the types can't carry.
 
@@ -68,4 +87,4 @@ Annotate non-obvious ordering and compensation inline, e.g. `createAlias -> stor
 
 Wait for explicit approval of the type signatures before writing any implementation code.
 
-If you produced these as a subagent, do NOT gate yourself: return the type contracts, the ledger (Resolved/Unresolved), and the call graph. The approving session holds the gate. A new ambiguity found while designing goes into **Unresolved** and is returned — never guessed.
+A new ambiguity found while designing goes into **Unresolved** — never guessed.

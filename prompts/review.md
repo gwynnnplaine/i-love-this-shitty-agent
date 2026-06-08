@@ -62,7 +62,9 @@ Write like a senior teammate on a small team. You know each other. You're direct
 
 Each finding is exactly: one question + one sentence explaining why. Then stop. If a code fix is obvious, add a bare code block. That's it.
 
-When you criticize something that has a code alternative, you MUST add a **now / could be / why it lasts** comparison after the question+why. Show the current code, the alternative you'd actually write instead, and one sentence on why it lasts — it absorbs likely change, kills an invalid state, deepens the interface — not just why it's tidier. No criticism without the thing you'd do instead. Skip the block only when the fix is non-code (naming, missing tests, design questions).
+When you criticize something that has a code alternative, you MUST add a **now / could be / why it lasts** comparison after the question+why. Show the current code, the alternative you'd actually write instead, and one sentence on why it lasts — it absorbs likely change, kills an invalid state, deepens the interface — not just why it's tidier. No criticism without the thing you'd do instead.
+
+Design critiques are NOT exempt — if you push back on a design, propose a concrete alternative: a now/could-be code block when the design is expressible in code, otherwise a concrete shape/signature/structure sketch. Never leave a design critique as an open question with no answer. Skip the block only for genuinely non-code gaps (naming, missing tests).
 
 The question must sound like something you'd actually say in a PR comment. Not "Why key `buildInsuranceLines` items by `.text`?" — that's robotic. Say: "Why are we keying by `.text`? Duplicate names would break React state."
 
@@ -120,19 +122,21 @@ Lowercase `nit` or `non-blocking` at the very end of the finding, after a period
 ## Output
 
 ### Flow map
-ASCII diagram. Input to output. When the change touches composition, DI, or adapter/seam wiring, draw two paths — production and test — and check they converge below the seam; divergence deeper than the adapter boundary is a finding (the core can't be tested without reaching past the seam).
+A clean single-ASCII **change-trace**, every review. Trace the values and decisions the diff changes from input to output, branch where the code branches, and annotate transitions inline (old→new wire values, the routing rule that consumes them, e.g. `'braintree' (was 'paypal')`). Boxes and short arrows, not a sprawling arrow-map. The diagram shows what the change does, not file lists.
+
+The prod/test seam diagram is separate and conditional: when the change touches DI/composition/adapter wiring, draw it per the `type-review` lens (which defers to the `type-design` seam diagram). Otherwise the change-trace is the only diagram.
 
 ### Findings
 Numbered blocks separated by `---`. Each: number + question + why + `file:line`. Optional bare code block. Every finding MUST cite the exact file and line number.
 
 ### Type design
-Produce the `type-review` verdict: score the change's type system **0–5** and label it **fast** or **lasts**, one sentence each with the deciding evidence.
+Produce the `type-review` verdict: score the change's type system **0–5** and label it **fast** or **lasts**, with the deciding evidence shown as a now/could-be/why-it-lasts code block (per the skill — always code, even for a 5/lasts), not prose.
 
 ### Verdict
 Answer as tech lead:
 - What does this change actually solve?
 - What's working that must NOT change, and why does it last? (the one keep-signal allowed — structural, not filler praise)
-- What would you push back on in a 1:1?
+- What would you push back on in a 1:1? — name the concrete fix, not an open question.
 - What's missing that a strong version would include?
 
 Keep each answer to one sentence. Then: **Approve**, **Request changes**, or **Needs discussion**.

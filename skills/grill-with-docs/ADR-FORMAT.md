@@ -18,9 +18,9 @@ That's it. An ADR can be a single paragraph. The value is in recording *that* a 
 
 Only include these when they add genuine value. Most ADRs won't need them.
 
-- **Status** frontmatter (`proposed | accepted | deprecated | superseded by ADR-NNNN`) — useful when decisions are revisited.
-- **Considered Options** — only when the rejected alternatives are worth remembering.
-- **Consequences** — only when non-obvious downstream effects need to be called out.
+- **Status** frontmatter (`proposed | accepted | deprecated | superseded by ADR-NNNN`) — useful when decisions are revisited
+- **Considered Options** — only when the rejected alternatives are worth remembering
+- **Consequences** — only when non-obvious downstream effects need to be called out
 
 ## Numbering
 
@@ -28,11 +28,11 @@ Scan `docs/adr/` for the highest existing number and increment by one.
 
 ## When to offer an ADR
 
-All three must be true:
+All three of these must be true:
 
-1. **Hard to reverse** — the cost of changing your mind later is meaningful.
+1. **Hard to reverse** — the cost of changing your mind later is meaningful
 2. **Surprising without context** — a future reader will look at the code and wonder "why on earth did they do it this way?"
-3. **The result of a real trade-off** — there were genuine alternatives and you picked one for specific reasons.
+3. **The result of a real trade-off** — there were genuine alternatives and you picked one for specific reasons
 
 If a decision is easy to reverse, skip it — you'll just reverse it. If it's not surprising, nobody will wonder why. If there was no real alternative, there's nothing to record beyond "we did the obvious thing."
 
@@ -45,7 +45,3 @@ If a decision is easy to reverse, skip it — you'll just reverse it. If it's no
 - **Deliberate deviations from the obvious path.** "We're using manual SQL instead of an ORM because X." Anything where a reasonable reader would assume the opposite. These stop the next engineer from "fixing" something that was deliberate.
 - **Constraints not visible in the code.** "We can't use AWS because of compliance requirements." "Response times must be under 200ms because of the partner API contract."
 - **Rejected alternatives when the rejection is non-obvious.** If you considered GraphQL and picked REST for subtle reasons, record it — otherwise someone will suggest GraphQL again in six months.
-
-### Seam placement is usually an ADR
-
-Where an interface lives — the seam, and which adapters sit behind it (prod vs test/memory) — is a hard-to-reverse, easily-second-guessed trade-off. When `type-design` settles a seam, that's a strong ADR candidate.
